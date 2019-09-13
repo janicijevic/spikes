@@ -165,7 +165,7 @@ function genSide(){
     for(let i = 0; i<nSpikes; i++){
         let index = Math.floor(Math.random()*10);
         while(wall[index] == 1){
-            hindex = Math.floor(Math.random()*10);
+            index = Math.floor(Math.random()*10);
         }
         wall[index] = 1;
     }
