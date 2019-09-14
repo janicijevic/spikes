@@ -27,7 +27,7 @@ function init(){
 }
 
 function setup() {
-    createCanvas(screen.width, screen.height);
+    createCanvas(350, 500);
     rectMode(CENTER);
     textAlign(CENTER);
     init();
