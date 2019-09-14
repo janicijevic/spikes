@@ -1,7 +1,6 @@
 let p;
 let dead, paused;
-let grav, jumpSpeed, a, score, spike, side, buff, nSpikes, deadfr, frLim;
-let wall;
+let grav, jumpSpeed, a, score, spike, side, buff, nSpikes, deadfr, frLim, jumped, jumpfr;
 
 function init(){
     p = {
@@ -15,6 +14,7 @@ function init(){
     jumpSpeed = 7;
     dead = false;
     frLim = 80;
+    jumped = -1;
     paused = true;
     a = 0;
     score = 0;
@@ -38,6 +38,8 @@ function draw() {
     background(230);
     fill(255);
     ellipse(width/2, height/2, width*2/3, width*2/3);
+
+    if(frameCount-jumpfr > 15 && jumped == 1) jumped = -1;
 
     //update
     if(!paused){
@@ -136,6 +138,8 @@ function draw() {
 function mousePressed(){
     if(paused) paused = false;
     if(!dead){
+        jumped = 1;
+        jumpfr = frameCount;
         p.dy = -jumpSpeed;
     }
     else{
@@ -150,13 +154,23 @@ function sgn(x){
 }
 
 function drawSprite(){
-    fill(170);
+    fill(90);
     
     noStroke();
-    if(!dead)fill(250, 0, 0);
-    rect(0, 0, p.r*2, p.r*2, 11);
-    if(!dead)fill(250, 0, 0);
+    //Body ------
+    //rect(0, 0, p.r*2, p.r*2, 5)   unicolor
+    if(!dead)fill(255, 40, 40);
+    rect(0, 0, p.r*2, p.r*2, 10);
+    //Tail
+    triangle(-side*p.r, 0, -side*p.r, -p.r/2, -side*p.r*3/2, -p.r/2);
+    if(!dead)fill(247, 40, 40);
+    rect(0, p.r/2, p.r*2, p.r, 0, 0, 10, 10);
 
+    //Wing ------
+    if(!dead) fill(207, 25, 25);
+    triangle(0, 0, -side*p.r*2/3, 0, -side*p.r*2/3, jumped*p.r*2/3); //poslednje menjaj za gore dole
+
+    //Beak ------
     if(!dead)fill(255, 220, 0);
     triangle(side*p.r, -p.r/2, side*p.r, 0, side*p.r*3/2, 0);
     if(!dead)fill(240, 200, 0);
