@@ -172,7 +172,7 @@ function drawSprite(){
 
     //Wing ------
     if(!dead) fill(207, 25, 25);
-    triangle(0, 0, -side*p.r*2/3, 0, -side*p.r*2/3, jumped*p.r*2/3); //poslednje menjaj za gore dole
+    triangle(0, 0, -side*p.r*2/3, 0, -side*p.r*2/3, -jumped*p.r*2/3); //poslednje menjaj za gore dole
 
     //Beak ------
     if(!dead)fill(255, 220, 0);
