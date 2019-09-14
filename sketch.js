@@ -1,6 +1,6 @@
 let p;
 let dead, paused;
-let grav, jumpSpeed, a, score, spike, side, buff, nSpikes, deadfr, frLim, jumped, jumpfr;
+let grav, jumpSpeed, a, score, spike, side, buff, nSpikes, deadfr, frLim, jumped, jumpfr, highScore;
 
 function init(){
     p = {
@@ -30,6 +30,7 @@ function setup() {
     createCanvas(350, 500);
     rectMode(CENTER);
     textAlign(CENTER);
+    highScore = 0;
     init();
     noStroke();
 }
@@ -60,8 +61,7 @@ function draw() {
 
     //Bottom
     if(p.y > height-p.r-spikeH || p.y < p.r+spikeH){
-        if(!dead) deadfr = frameCount;
-        dead = true;
+        die()
     }
     if(p.y > height-p.r){
         p.dy = -jumpSpeed*5/4;
@@ -82,8 +82,7 @@ function draw() {
             //ellipse(x, y, rad, rad);
             //pop();
             if(sq(p.x - x) + sq(p.y - y) < sq(rad)){
-                if(!dead) deadfr = frameCount;
-                dead = true;
+                die()
             }
 
         }
@@ -93,6 +92,11 @@ function draw() {
     textSize(150);
     fill(190);
     text(("0"+score).slice(-2), width/2, height/2+50);
+    if(paused || dead){
+        textSize(30);
+        fill(150);
+        text("Best score: "+highScore, width/2, height*4/5);
+    }
 
     //Bird
     push();
@@ -202,4 +206,10 @@ function genSide(){
 function newN(score){
     let n = Math.floor(Math.sqrt(score+3));
     return n>8 ? 8 : n;
+}
+
+function die(){
+    if(!dead) deadfr = frameCount;
+    dead = true;
+    if(score > highScore) highScore = score;
 }
