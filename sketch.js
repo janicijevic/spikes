@@ -27,7 +27,7 @@ function init(){
 }
 
 function setup() {
-    createCanvas(350, 500);
+    createCanvas(screen.width, screen.height);
     rectMode(CENTER);
     textAlign(CENTER);
     init();
@@ -37,7 +37,7 @@ function setup() {
 function draw() {
     background(230);
     fill(255);
-    ellipse(width/2, height/2, width*2/3, width*2/3)
+    ellipse(width/2, height/2, width*2/3, width*2/3);
 
     //update
     if(!paused){
@@ -155,12 +155,15 @@ function drawSprite(){
     noStroke();
     if(!dead)fill(250, 0, 0);
     rect(0, 0, p.r*2, p.r*2, 11);
+    if(!dead)fill(250, 0, 0);
 
     if(!dead)fill(255, 220, 0);
     triangle(side*p.r, -p.r/2, side*p.r, 0, side*p.r*3/2, 0);
     if(!dead)fill(240, 200, 0);
     triangle(side*p.r, p.r/2, side*p.r, 0, side*p.r*3/2, 0);
 
+    fill(255);
+    ellipse(side*p.r/2, -p.r/2, p.r/4+2, p.r/4+2);
 
     // fill(255, 220, 0);
     // triangle(p.r, -p.r/2, p.r, 0, p.r*3/2, 0);
