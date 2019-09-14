@@ -1,6 +1,6 @@
 let p;
 let dead, paused;
-let grav, jumpSpeed, a, score, spike, side, buff, nSpikes;
+let grav, jumpSpeed, a, score, spike, side, buff, nSpikes, deadfr, frLim;
 let wall;
 
 function init(){
@@ -14,6 +14,7 @@ function init(){
     grav = 0.4;
     jumpSpeed = 7;
     dead = false;
+    frLim = 80;
     paused = true;
     a = 0;
     score = 0;
@@ -57,12 +58,12 @@ function draw() {
 
     //Bottom
     if(p.y > height-p.r-spikeH || p.y < p.r+spikeH){
+        if(!dead) deadfr = frameCount;
         dead = true;
     }
     if(p.y > height-p.r){
         p.dy = -jumpSpeed*5/4;
         p.y = height-p.r;
-        dead = true;
     }
 
     if(dead){
@@ -79,6 +80,7 @@ function draw() {
             //ellipse(x, y, rad, rad);
             //pop();
             if(sq(p.x - x) + sq(p.y - y) < sq(rad)){
+                if(!dead) deadfr = frameCount;
                 dead = true;
             }
 
@@ -137,7 +139,9 @@ function mousePressed(){
         p.dy = -jumpSpeed;
     }
     else{
-        init();
+        if(frameCount - deadfr > frLim){
+            init();
+        }
     }
 }
 
@@ -146,11 +150,18 @@ function sgn(x){
 }
 
 function drawSprite(){
+    fill(170);
     
     noStroke();
     if(!dead)fill(250, 0, 0);
-    else fill(170);
     rect(0, 0, p.r*2, p.r*2, 11);
+
+    if(!dead)fill(255, 220, 0);
+    triangle(side*p.r, -p.r/2, side*p.r, 0, side*p.r*3/2, 0);
+    if(!dead)fill(240, 200, 0);
+    triangle(side*p.r, p.r/2, side*p.r, 0, side*p.r*3/2, 0);
+
+
     // fill(255, 220, 0);
     // triangle(p.r, -p.r/2, p.r, 0, p.r*3/2, 0);
     // fill(240, 200, 0);
