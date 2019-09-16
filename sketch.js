@@ -18,7 +18,7 @@ function init(){
         dy: 0
     }
     grav = 0.35;
-    jumpSpeed = 6.5;
+    jumpSpeed = 7;
     dead = false;
     frLim = 80;
     jumped = -1;
