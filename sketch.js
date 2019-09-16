@@ -1,7 +1,7 @@
 let p;
 let dead, paused;
 let grav, jumpSpeed, a, score, spike, side, buff, nSpikes, deadfr, frLim, jumped, jumpfr, highScore;
-let released = true;
+
 
 let tOff = 50;
 let lOff = 20;
@@ -157,7 +157,6 @@ function draw() {
 
 
 function touchStarted(){
-    if(released){
         if(paused) paused = false;
         if(!dead){
             jumped = 1;
@@ -170,11 +169,9 @@ function touchStarted(){
             }
         }
 
-        released = false;
-    }
 }
-function touchEnded(){
-    released = true;
+function touchEnded(event){
+    event.preventDefault();
 }
 
 function keyPressed(){
