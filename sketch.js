@@ -1,11 +1,19 @@
 let p;
 let dead, paused;
 let grav, jumpSpeed, a, score, spike, side, buff, nSpikes, deadfr, frLim, jumped, jumpfr, highScore;
+let released = true;
+
+let tOff = 50;
+let lOff = 20;
+let rOff = 20;
+let bOff = 100;
+let scr = {width: 300, height: 450};
+
 
 function init(){
     p = {
-        x: width/2,
-        y: height/2,
+        x: scr.width/2,
+        y: scr.height/2,
         r: 15,
         dx: 4,
         dy: 0
@@ -18,7 +26,7 @@ function init(){
     paused = true;
     a = 0;
     score = 0;
-    spike = height/15;
+    spike = scr.height/15;
     spikeH = spike*2/3;
     buff = spike/3;
     side = 1; //right
@@ -27,7 +35,7 @@ function init(){
 }
 
 function setup() {
-    createCanvas(350, 500);
+    createCanvas(lOff + scr.width + rOff, tOff + scr.height + bOff);
     rectMode(CENTER);
     textAlign(CENTER);
     highScore = 0;
@@ -36,9 +44,12 @@ function setup() {
 }
 
 function draw() {
-    background(230);
+    background(150);
+    translate(rOff, tOff);
+    fill(230);
+    rect(scr.width/2, scr.height/2, scr.width, scr.height);
     fill(255);
-    ellipse(width/2, height/2, width*2/3, width*2/3);
+    ellipse(scr.width/2, scr.height/2, scr.width*2/3, scr.width*2/3);
 
     if(frameCount-jumpfr > 15 && jumped == 1) jumped = -1;
 
@@ -50,7 +61,7 @@ function draw() {
     }
 
     //Side
-    if(p.x > width - p.r || p.x < p.r){
+    if(p.x > scr.width - p.r || p.x < p.r){
         if(!dead){
             score += 1;
             side = -side;
@@ -60,12 +71,12 @@ function draw() {
     }
 
     //Bottom
-    if(p.y > height-p.r-spikeH || p.y < p.r+spikeH){
+    if(p.y > scr.height-p.r-spikeH || p.y < p.r+spikeH){
         die()
     }
-    if(p.y > height-p.r){
+    if(p.y > scr.height-p.r){
         p.dy = -jumpSpeed*5/4;
-        p.y = height-p.r;
+        p.y = scr.height-p.r;
     }
 
     if(dead){
@@ -74,7 +85,7 @@ function draw() {
 
     for(let i = 0; i<10; i++){
         if(wall[i] == 1){
-            let x = side == 1 ? width : 0;
+            let x = side == 1 ? scr.width : 0;
             let y = buff*3 + spike*i + buff*(i+1) + spike/2;
             let rad = spikeH + p.r*3/4;
             //push();
@@ -91,11 +102,11 @@ function draw() {
     //Score
     textSize(150);
     fill(190);
-    text(("0"+score).slice(-2), width/2, height/2+50);
+    text(("0"+score).slice(-2), scr.width/2, scr.height/2+50);
     if(paused || dead){
         textSize(30);
         fill(150);
-        text("Best score: "+highScore, width/2, height*4/5);
+        text("Best score: "+highScore, scr.width/2, scr.height*4/5);
     }
 
     //Bird
@@ -108,7 +119,7 @@ function draw() {
     //Spikes
     push();
     translate(0, buff*3);
-    if(side == 1)translate(width, 0);
+    if(side == 1)translate(scr.width, 0);
     for(let i=0; i<10; i++){
         translate(0, buff);
         if(wall[i]){
@@ -129,26 +140,55 @@ function draw() {
     for(let i = 0; i<7; i++){
         translate(buff, 0);
         triangle(i*spike, 0, (i+1)*spike, 0, (i+1/2)*spike, spikeH);
-        translate(0, height);
+        translate(0, scr.height);
         triangle(i*spike, 0, (i+1)*spike, 0, (i+1/2)*spike, -spikeH);
-        translate(0, -height);
+        translate(0, -scr.height);
     }
     pop();
 
+
+    //Walls
+    fill(150);
+    rect(-lOff/2, scr.height/2, lOff, scr.height);
+    rect(scr.width+rOff/2, scr.height/2, rOff, scr.height);
+    rect(scr.width/2, -tOff/2, scr.width, tOff);
+    rect(scr.width/2, scr.height+bOff/2, scr.width, tOff);
 }
 
 
+function touchStarted(){
+    if(released){
+        if(paused) paused = false;
+        if(!dead){
+            jumped = 1;
+            jumpfr = frameCount;
+            p.dy = -jumpSpeed;
+        }
+        else{
+            if(frameCount - deadfr > frLim){
+                init();
+            }
+        }
 
-function mousePressed(){
-    if(paused) paused = false;
-    if(!dead){
-        jumped = 1;
-        jumpfr = frameCount;
-        p.dy = -jumpSpeed;
+        released = false;
     }
-    else{
-        if(frameCount - deadfr > frLim){
-            init();
+}
+function touchEnded(){
+    released = true;
+}
+
+function keyPressed(){
+    if(keyCode == 32){
+    if(paused) paused = false;
+        if(!dead){
+            jumped = 1;
+            jumpfr = frameCount;
+            p.dy = -jumpSpeed;
+        }
+        else{
+            if(frameCount - deadfr > frLim){
+                init();
+            }
         }
     }
 }
