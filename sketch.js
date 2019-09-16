@@ -2,7 +2,6 @@ let p;
 let dead, paused;
 let grav, jumpSpeed, a, score, spike, side, buff, nSpikes, deadfr, frLim, jumped, jumpfr, highScore;
 
-
 let tOff = 50;
 let lOff = 20;
 let rOff = 20;
@@ -13,7 +12,7 @@ let scr = {width: 300, height: 450};
 function init(){
     p = {
         x: scr.width/2,
-        y: scr.height/2,
+        y: scr.height/2-10,
         r: 15,
         dx: 4,
         dy: 0
@@ -36,6 +35,7 @@ function init(){
 
 function setup() {
     createCanvas(lOff + scr.width + rOff, tOff + scr.height + bOff);
+    document.getElementsByTagName("canvas")[0].addEventListener("click", (e) => {e.preventDefault()});
     rectMode(CENTER);
     textAlign(CENTER);
     highScore = 0;
@@ -58,6 +58,9 @@ function draw() {
         p.x += p.dx;
         p.dy+= grav;
         p.y += p.dy;
+    }
+    else{
+        p.y += sin(frameCount/10);
     }
 
     //Side
@@ -100,9 +103,11 @@ function draw() {
     }
 
     //Score
+    if(!paused){
     textSize(150);
     fill(190);
     text(("0"+score).slice(-2), scr.width/2, scr.height/2+50);
+    }
     if(paused || dead){
         textSize(30);
         fill(150);
@@ -157,38 +162,24 @@ function draw() {
 
 
 function touchStarted(){
-        if(paused) paused = false;
-        if(!dead){
-            jumped = 1;
-            jumpfr = frameCount;
-            p.dy = -jumpSpeed;
+    if(paused) paused = false;
+    if(!dead){
+        jumped = 1;
+        jumpfr = frameCount;
+        p.dy = -jumpSpeed;
+    }
+    else{
+        if(frameCount - deadfr > frLim){
+            init();
         }
-        else{
-            if(frameCount - deadfr > frLim){
-                init();
-            }
-        }
+    }
 
 }
 function touchEnded(event){
     event.preventDefault();
+
 }
 
-function keyPressed(){
-    if(keyCode == 32){
-    if(paused) paused = false;
-        if(!dead){
-            jumped = 1;
-            jumpfr = frameCount;
-            p.dy = -jumpSpeed;
-        }
-        else{
-            if(frameCount - deadfr > frLim){
-                init();
-            }
-        }
-    }
-}
 
 function sgn(x){
     return x > 0 ? 1 : -1;
@@ -250,3 +241,32 @@ function die(){
     dead = true;
     if(score > highScore) highScore = score;
 }
+
+
+
+
+/*function HSVtoRGB(h, s, v) {
+    var r, g, b, i, f, p, q, t;
+    if (arguments.length === 1) {
+        s = h.s, v = h.v, h = h.h;
+    }
+    i = Math.floor(h * 6);
+    f = h * 6 - i;
+    p = v * (1 - s);
+    q = v * (1 - f * s);
+    t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+    }
+    return {
+        r: Math.round(r * 255),
+        g: Math.round(g * 255),
+        b: Math.round(b * 255)
+    };
+}
+*/
