@@ -61,7 +61,7 @@ function draw() {
     }
     else{
         p.y += sin(frameCount/10);
-        if(p.y>0) side = -1;
+        if(p.y>scr.height/2+tOff) side = -1;
         else side=1;
     }
 
