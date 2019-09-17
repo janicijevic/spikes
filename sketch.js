@@ -1,12 +1,15 @@
-let p;
-let dead, paused;
-let grav, jumpSpeed, a, score, spike, side, buff, nSpikes, deadfr, frLim, jumped, jumpfr, highScore;
-
+let p, but;
+let dead, paused, jumped, side;
+let grav, jumpSpeed, a, score, spike, buff, nSpikes, deadfr, frLim, jumpfr, highScore;
+let customizing = false;
 let tOff = 50;
 let lOff = 20;
 let rOff = 20;
 let bOff = 100;
 let scr = {width: 300, height: 450};
+let pkr = {x: 0, y: 0, w: 0, y2:this.w/3};
+let color = {r: 255, g: 40, b: 40, h:0, s:0.84, v:1, hx:0, x:0, y:0};
+let darken = 20;
 
 
 function init(){
@@ -15,9 +18,16 @@ function init(){
         y: scr.height/2-10,
         r: 15,
         dx: 4,
-        dy: 0
+        dy: 0,
+        corner: 10
     }
-    grav = 0.35;
+    but = {
+        x:scr.width/4,
+        y:scr.height/5 - p.r*2,
+        w:scr.width/2,
+        h:p.r*2
+    }
+    grav = 0.4;
     jumpSpeed = 7;
     dead = false;
     frLim = 80;
@@ -41,10 +51,19 @@ function setup() {
     highScore = 0;
     init();
     noStroke();
+
+    pkr.x = width/15;
+    pkr.w = width/2 - 2*pkr.x;
+    pkr.y2 = pkr.w/4;
+    pkr.y = height - height/5 - pkr.w - pkr.y2*2;
 }
 
 function draw() {
     background(150);
+    if(customizing) {
+        customize()
+        return;
+    }
     translate(rOff, tOff);
     fill(230);
     rect(scr.width/2, scr.height/2, scr.width, scr.height);
@@ -60,7 +79,9 @@ function draw() {
         p.y += p.dy;
     }
     else{
-        p.y += sin(frameCount/10);
+        p.y = scr.height/2 + scr.width/25*sin(frameCount/15);
+        if(cos(frameCount/15)>0) jumped = 1;
+        else jumped = -1;
     }
 
     //Side
@@ -114,6 +135,15 @@ function draw() {
         text("Best score: "+highScore, scr.width/2, scr.height*4/5);
     }
 
+    //Customization button
+    if(paused && !customizing){
+        fill(255);
+        rect(but.x+but.w/2, but.y+but.h/2, but.w, but.h, 10);
+        textSize(20);
+        fill(150);
+        text("Customize", but.x+but.w/2, but.y+but.h*3/4);
+    }
+
     //Bird
     push();
     translate(p.x, p.y);
@@ -162,24 +192,49 @@ function draw() {
 
 
 function touchStarted(){
-    if(paused) {
-    paused = false;
-    }
-    if(!dead){
-        jumped = 1;
-        jumpfr = frameCount;
-        p.dy = -jumpSpeed;
-    }
-    else{
-        if(frameCount - deadfr > frLim){
-            init();
+    if(paused && !customizing){
+        if(mouseX < but.x+but.w+lOff && mouseX > but.x+lOff && mouseY < but.y+but.h+tOff && mouseY > but.y+tOff){
+            customizing = true;
+            return;
         }
     }
+    if(!customizing){
+        if(paused) paused = false;
+        if(!dead){
+            jumped = 1;
+            jumpfr = frameCount;
+            p.dy = -jumpSpeed;
+        }
+        else{
+            if(frameCount - deadfr > frLim){
+                init();
+            }
+        }
+    }
+    else {
+        if(mouseY > height-height/5){
+            customizing = false;
+        }
+        else if(mouseX > pkr.x && mouseX < pkr.x+pkr.w){
+            if(mouseY < pkr.y+pkr.w && mouseY > pkr.y){
+                //Gornji color picker
+                color.s = (mouseX-pkr.x)/pkr.w;
+                color.v = 1-(mouseY-pkr.y)/pkr.w;
+                let c = HSVtoRGB(color.h, color.s, color.v);
+                color.r = c.r; color.g = c.g; color.b = c.b;
+            }
+            else if(mouseY < pkr.y+pkr.w+pkr.y2+7 && mouseY > pkr.y+pkr.w+pkr.y2-7){
+                //Hue slider
+                color.h = (mouseX-pkr.x)/pkr.w;
+                let c = HSVtoRGB(color.h, color.s, color.v);
+                color.r = c.r; color.g = c.g; color.b = c.b;
 
+            }
+        }
+    }
 }
 function touchEnded(event){
     event.preventDefault();
-
 }
 
 
@@ -193,15 +248,19 @@ function drawSprite(){
     noStroke();
     //Body ------
     //rect(0, 0, p.r*2, p.r*2, 5)   unicolor
-    if(!dead)fill(255, 40, 40);
-    rect(0, 0, p.r*2, p.r*2, 10);
+    //255, 40, 40 dobra crvena
+    if(!dead)fill(color.r, color.g, color.b);
+    rect(0, 0, p.r*2, p.r*2, p.corner);
     //Tail
     triangle(-side*p.r, 0, -side*p.r, -p.r/2, -side*p.r*3/2, -p.r/2);
-    if(!dead)fill(247, 40, 40);
-    rect(0, p.r/2, p.r*2, p.r, 0, 0, 10, 10);
+    //Bottom half
+    //fill(247, 40, 40)
+    if(!dead)fill(color.r-darken, color.g-darken, color.b-darken);
+    rect(0, p.r/2, p.r*2, p.r, 0, 0, p.corner, p.corner);
 
     //Wing ------
-    if(!dead) fill(207, 25, 25);
+    //fill(207, 25, 25)
+    if(!dead) fill(color.r-darken*3, color.g-darken*3, color.b-darken*3);
     triangle(0, 0, -side*p.r*2/3, 0, -side*p.r*2/3, -jumped*p.r*2/3); //poslednje menjaj za gore dole
 
     //Beak ------
@@ -244,10 +303,57 @@ function die(){
     if(score > highScore) highScore = score;
 }
 
+function customize(){
+    let bottom = scr.heigth/5;
+    //fill(0);
+    //rect(pkr.x+pkr.w/2, pkr.y+pkr.w/2, pkr.w, pkr.w);
+    for(let i = 0; i<pkr.w; i+=10){
+        for(let j = 0; j<pkr.w; j+=10){
+            let s = (i/pkr.w);
+            let v = 1-(j/pkr.w);
+            let col = HSVtoRGB(color.h, s, v);
+            fill(col.r, col.g, col.b);
+            ellipse(pkr.x+i, pkr.y+j, 15, 15);
+        }
+    }
+
+    fill(color.r, color.g, color.b);
+    stroke(0);
+    ellipse(pkr.x+color.s*pkr.w, pkr.y+pkr.w*(1-color.v), 15, 15);
+    noStroke();
+
+    //fill(0);
+    //rect(pkr.x+pkr.w/2, pkr.y+pkr.w+pkr.y2, pkr.w, pkr.y2/2);
+    for(let i = 0; i<pkr.w; i+=5){
+        let col = HSVtoRGB(i/pkr.w, 1, 1);
+        fill(col.r, col.g, col.b);
+        ellipse(pkr.x+i, pkr.y+pkr.w+pkr.y2, 15, 15);
+    }
+    fill(255);
+    rect(pkr.x+color.h*pkr.w, pkr.y+pkr.w+pkr.y2, 5, pkr.y2/2);
 
 
 
-/*function HSVtoRGB(h, s, v) {
+    //Bottom where i wanna put the preview and its the back button
+    fill(240);
+    rect(width/2, height-height/10, width, height/5);
+    
+    textSize(20);
+    fill(150);
+    text("Back", 40, height-15);
+
+    push();
+    translate(width/2, height-height/10+scr.width/25*sin(frameCount/15));
+    if(cos(frameCount/15)>0) jumped = 1;
+    else jumped = -1;
+    drawSprite();
+    pop();
+
+}
+
+
+
+function HSVtoRGB(h, s, v) {
     var r, g, b, i, f, p, q, t;
     if (arguments.length === 1) {
         s = h.s, v = h.v, h = h.h;
@@ -271,4 +377,3 @@ function die(){
         b: Math.round(b * 255)
     };
 }
-*/
