@@ -171,7 +171,7 @@ function draw() {
 
     push();
     fill(150);
-    translate(buff, 0);
+    translate(buff/2, 0);
     for(let i = 0; i<7; i++){
         translate(buff, 0);
         triangle(i*spike, 0, (i+1)*spike, 0, (i+1/2)*spike, spikeH);
