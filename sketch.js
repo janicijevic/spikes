@@ -61,6 +61,8 @@ function draw() {
     }
     else{
         p.y += sin(frameCount/10);
+        if(p.y>0) side = -1;
+        else side=1;
     }
 
     //Side
@@ -162,7 +164,10 @@ function draw() {
 
 
 function touchStarted(){
-    if(paused) paused = false;
+    if(paused) {
+    paused = false;
+    side=1;
+    }
     if(!dead){
         jumped = 1;
         jumpfr = frameCount;
