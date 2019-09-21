@@ -9,7 +9,7 @@ let rOff = 20;
 let bOff = 100;
 let scr = {width: 300, height: 450};
 let pkr = {x: 0, y: 0, w: 0, y2:this.w/3};
-let color = {r: 255, g: 40, b: 40, h:0, s:0.84, v:1, hx:0, x:0, y:0};
+let color;
 let darken = 20;
 
 
@@ -41,7 +41,6 @@ function init(){
     spikeH = spike*2/3;
     buff = spike/3;
     side = 1; //right
-    shape = 0; //rect
     wall = [0,0,0,0,0,0,0,0,0,0];
     path = [];
     candy = {
@@ -57,8 +56,7 @@ function setup() {
     document.getElementsByTagName("canvas")[0].addEventListener("click", (e) => {e.preventDefault()});
     rectMode(CENTER);
     textAlign(CENTER);
-    highScore = 0;
-    candies = 0;
+    loadVars();
     init();
     noStroke();
 
@@ -140,8 +138,9 @@ function draw() {
     }
 
     //Candy
-    if(sq(candy.x - p.x) + sq(candy.y - p.y) < sq(candy.r*3/2+p.r) && hitWall){
+    if(sq(candy.x - p.x) + sq(candy.y - p.y) < sq(candy.r*3/2+p.r) && hitWall && !dead && !paused){
         candies++;
+        localStorage.setItem("candies", candies);
         hitWall = false;
         candy.side = -sgn(p.dx);
         if(candy.side == 1)
@@ -232,6 +231,11 @@ function draw() {
     rect(scr.width/2, scr.height+tOff/2, scr.width, tOff);
 }
 
+function keyPressed(){
+    if(keyCode == "p"){
+        localStorage.clear();
+    }
+}
 
 function touchStarted(){
     if(paused && !customizing){
@@ -273,6 +277,7 @@ function touchStarted(){
                 let c = HSVtoRGB(color.h, color.s, color.v);
                 color.r = c.r; color.g = c.g; color.b = c.b;
             }
+            setColorStorage();
         }
         //Shape
         else {
@@ -285,6 +290,7 @@ function touchStarted(){
                 //Circle
                 shape = 1;
             }
+            localStorage.setItem("shape", shape);
         }
     }
 }
@@ -387,7 +393,10 @@ function newN(score){
 function die(){
     if(!dead) deadfr = frameCount;
     dead = true;
-    if(score > highScore) highScore = score;
+    if(score > highScore){
+        highScore = score;
+        localStorage.setItem("highScore", highScore);
+    }
 }
 
 function customize(){
@@ -449,7 +458,19 @@ function customize(){
 
 }
 
+function setColorStorage(){
+    localStorage.setItem("color", JSON.stringify(color)); 
+}
 
+function loadVars(){
+    highScore = max(localStorage.getItem("highScore"), 0);
+    candies = max(localStorage.getItem("candies"), 0);
+    shape = max(localStorage.getItem("shape"), 0);
+    color = JSON.parse(localStorage.getItem("color"));
+    if(color == null){
+        color = {r: 255, g: 40, b: 40, h:0, s:0.84, v:1};        
+    }
+}
 
 function HSVtoRGB(h, s, v) {
     var r, g, b, i, f, p, q, t;
