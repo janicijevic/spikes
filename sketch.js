@@ -8,7 +8,7 @@ let lOff = 20;
 let rOff = 20;
 let bOff = 100;
 let scr = {width: 300, height: 450};
-let pkr = {x: 0, y: 0, w: 0, y2:this.w/3};
+let pkr = {x: 0, y: 0, w: 0, y2:this.w/3, clicked: false};
 let color;
 let darken = 20;
 
@@ -45,7 +45,7 @@ function init(){
     path = [];
     candy = {
         x:scr.width-scr.width/10,
-        y:buff*3+Math.floor(Math.random()*10)*(spike+buff),
+        y:buff*3+(Math.floor(Math.random()*8)+1)*(spike+buff),
         r:p.r/2,
         side: 1
     }
@@ -265,19 +265,11 @@ function touchStarted(){
         //Color picker
         else if(mouseX > pkr.x && mouseX < pkr.x+pkr.w){
             if(mouseY < pkr.y+pkr.w && mouseY > pkr.y){
-                //Gornji color picker
-                color.s = (mouseX-pkr.x)/pkr.w;
-                color.v = 1-(mouseY-pkr.y)/pkr.w;
-                let c = HSVtoRGB(color.h, color.s, color.v);
-                color.r = c.r; color.g = c.g; color.b = c.b;
+                pkr.topClicked = true;
             }
             else if(mouseY < pkr.y+pkr.w+pkr.y2+7 && mouseY > pkr.y+pkr.w+pkr.y2-7){
-                //Hue slider
-                color.h = (mouseX-pkr.x)/pkr.w;
-                let c = HSVtoRGB(color.h, color.s, color.v);
-                color.r = c.r; color.g = c.g; color.b = c.b;
+                pkr.botClicked = true;
             }
-            setColorStorage();
         }
         //Shape
         else {
@@ -297,6 +289,10 @@ function touchStarted(){
 
 function touchEnded(event){
     event.preventDefault();
+    if(customizing){
+        pkr.topClicked = false;
+        pkr.botClicked = false;
+    }
 }
 
 function sgn(x){
@@ -403,6 +399,31 @@ function customize(){
     let bottom = scr.heigth/5;
     //fill(0);
     //rect(pkr.x+pkr.w/2, pkr.y+pkr.w/2, pkr.w, pkr.w);
+
+    if(mouseX > pkr.x && mouseX < pkr.x+pkr.w){    
+        if(pkr.topClicked){
+            if(mouseY < pkr.y+pkr.w && mouseY > pkr.y){
+                //Gornji color picker
+                color.s = (mouseX-pkr.x)/pkr.w;
+                color.v = 1-(mouseY-pkr.y)/pkr.w;
+                let c = HSVtoRGB(color.h, color.s, color.v);
+                color.r = c.r; color.g = c.g; color.b = c.b;
+                setColorStorage();
+            }
+        }
+        if(pkr.botClicked){
+            //if(mouseY < pkr.y+pkr.w+pkr.y2+7 && mouseY > pkr.y+pkr.w+pkr.y2-7){
+                //Hue slider
+                color.h = (mouseX-pkr.x)/pkr.w;
+                let c = HSVtoRGB(color.h, color.s, color.v);
+                color.r = c.r; color.g = c.g; color.b = c.b;
+                setColorStorage();
+
+            //}
+        }
+    }
+    
+
     for(let i = 0; i<pkr.w; i+=10){
         for(let j = 0; j<pkr.w; j+=10){
             let s = (i/pkr.w);
