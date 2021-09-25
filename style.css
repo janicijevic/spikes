@@ -1,0 +1,16 @@
+
+body{
+    background-color: rgb(150 150 150);
+    padding : 0;
+    margin : 0;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+canvas{
+    margin: auto;
+    padding-bottom: 9vh;
+}
